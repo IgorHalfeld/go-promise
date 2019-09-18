@@ -22,8 +22,7 @@ func (p *Promise) Then(success func(interface{}, func())) *Promise {
 	go func() {
 		select {
 		case result := <-resolve:
-			success(result, done)
-			wg.Done()
+			success(result, wg.Done)
 		}
 	}()
 	wg.Wait()
@@ -36,14 +35,9 @@ func (p *Promise) Catch(failure func(error, func())) *Promise {
 	go func() {
 		select {
 		case result := <-reject:
-			failure(result, done)
-			wg.Done()
+			failure(result, wg.Done)
 		}
 	}()
 	wg.Wait()
 	return p
-}
-
-func done() {
-	// wg.Done()
 }
