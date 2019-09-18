@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	p := promise.NewPromise(func(resolve chan interface{}, reject chan error) {
+	p := promise.New(func(resolve chan interface{}, reject chan error) {
 		resp, err := http.Get("http://gobyexample.com")
 		if err != nil {
 			panic(err)
