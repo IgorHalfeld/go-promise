@@ -45,13 +45,5 @@ func (p *Promise) Catch(failure func(error, func())) *Promise {
 }
 
 func done() {
-	if _, ok := <-resolve; ok {
-		close(resolve)
-		wg.Done()
-	}
-
-	if _, ok := <-reject; ok {
-		close(reject)
-		wg.Done()
-	}
+	// wg.Done()
 }

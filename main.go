@@ -16,7 +16,6 @@ func main() {
 		defer resp.Body.Close()
 		resolve <- resp.Status
 		// reject <- errors.New("Deu ruim")
-
 	})
 
 	request.Then(func(value interface{}, done func()) {
