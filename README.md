@@ -20,13 +20,12 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-    defer resp.Body.Close()
-    
-    if resp.Status == 200 {
-      resolve <- resp.Status
-    } else {
-      reject <- errors.New("Deu ruim")
-    }
+		defer resp.Body.Close()
+		if resp.Status == 200 {
+			resolve <- resp.Status
+		} else {
+			reject <- errors.New("Errr...")
+		}
 	})
 
 	p.Then(func(value interface{}) {
