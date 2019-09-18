@@ -1,10 +1,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
-	"github.com/igorhalfeld/go-promise/promise"
+	"github.com/igorhalfeld/go-promise"
 )
 
 func main() {
@@ -14,8 +15,12 @@ func main() {
 			panic(err)
 		}
 		defer resp.Body.Close()
-		resolve <- resp.Status
-		// reject <- errors.New("Deu ruim")
+
+		if resp.StatusCode == 200 {
+			resolve <- resp.Status
+		} else {
+			reject <- errors.New("ERRR")
+		}
 	})
 
 	p.Then(func(value interface{}) {

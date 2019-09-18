@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/igorhalfeld/go-promise/promise"
+	"github.com/igorhalfeld/go-promise"
 )
 
 func main() {
