@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -8,21 +9,22 @@ import (
 )
 
 func main() {
-	request := promise.NewPromise(func(resolve chan interface{}, _ chan error) {
+	request := promise.NewPromise(func(_ chan interface{}, reject chan error) {
 		resp, err := http.Get("http://gobyexample.com")
 		if err != nil {
 			panic(err)
 		}
 		defer resp.Body.Close()
 
-		resolve <- resp.Status
+		// resolve <- resp.Status
+		reject <- errors.New("Deu ruim")
 	})
 
-	request.Then(func(success chan interface{}) {
-		fmt.Println("Success", <-success)
+	request.Then(func(value interface{}) {
+		fmt.Println("Success", value)
 	})
-	// .Catch(func(err chan error) {
-	// 	fmt.Println("Error", <-err)
-	// })
+	request.Catch(func(err error) {
+		fmt.Println("Error", err)
+	})
 
 }
