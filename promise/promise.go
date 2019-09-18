@@ -1,13 +1,11 @@
 package promise
 
-import "sync"
-
 // Promise represents a promise struct
 type Promise struct{}
 
-var wg sync.WaitGroup
 var resolve = make(chan interface{}, 1)
 var reject = make(chan error, 1)
+var done = make(chan bool, 1)
 
 // NewPromise represents a new instance of Promise struct
 func NewPromise(fn func(chan interface{}, chan error)) *Promise {
@@ -17,27 +15,29 @@ func NewPromise(fn func(chan interface{}, chan error)) *Promise {
 }
 
 // Then represents a next chain of success flow
-func (p *Promise) Then(success func(interface{}, func())) *Promise {
-	wg.Add(1)
+func (p *Promise) Then(success func(interface{})) *Promise {
 	go func() {
-		select {
-		case result := <-resolve:
-			success(result, wg.Done)
+		if result, ok := <-resolve; ok {
+			done <- ok
+			close(reject)
+			success(result)
 		}
 	}()
-	wg.Wait()
 	return p
 }
 
 // Catch represents a next chain of failure flow
-func (p *Promise) Catch(failure func(error, func())) *Promise {
-	wg.Add(1)
+func (p *Promise) Catch(failure func(error)) *Promise {
 	go func() {
-		select {
-		case result := <-reject:
-			failure(result, wg.Done)
+		if result, ok := <-reject; ok {
+			done <- ok
+			failure(result)
+			close(resolve)
 		}
 	}()
-	wg.Wait()
 	return p
+}
+
+func (p *Promise) Wait() {
+	<-done
 }

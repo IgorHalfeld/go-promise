@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	request := promise.NewPromise(func(resolve chan interface{}, _ chan error) {
+	p := promise.NewPromise(func(resolve chan interface{}, reject chan error) {
 		resp, err := http.Get("http://gobyexample.com")
 		if err != nil {
 			panic(err)
@@ -18,12 +18,11 @@ func main() {
 		// reject <- errors.New("Deu ruim")
 	})
 
-	request.Then(func(value interface{}, done func()) {
+	p.Then(func(value interface{}) {
 		fmt.Println("Success", value)
-		done()
-	})
-	request.Catch(func(err error, done func()) {
+	}).Catch(func(err error) {
 		fmt.Println("Error", err)
-		done()
 	})
+
+	p.Wait()
 }
