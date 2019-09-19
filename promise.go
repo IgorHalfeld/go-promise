@@ -8,13 +8,13 @@ type Promise struct {
 }
 
 // New represents a new instance of Promise struct
-func New(fn func(chan interface{}, chan error)) *Promise {
+func New(fn func(func(interface{}), func(error))) *Promise {
 	promise := &Promise{
 		resolve: make(chan interface{}, 1),
 		reject:  make(chan error, 1),
 		done:    make(chan bool, 1),
 	}
-	go fn(promise.resolve, promise.reject)
+	go fn(promise.resolveFn, promise.rejectFn)
 	return promise
 }
 
@@ -44,4 +44,12 @@ func (p *Promise) Catch(failure func(error)) *Promise {
 
 func (p *Promise) Wait() {
 	<-p.done
+}
+
+func (p *Promise) resolveFn(i interface{}) {
+	p.resolve <- i
+}
+
+func (p *Promise) rejectFn(e error) {
+	p.reject <- e
 }
