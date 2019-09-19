@@ -8,6 +8,7 @@ Manage async flow as a javascript person
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -15,16 +16,17 @@ import (
 )
 
 func main() {
-	p := promise.New(func(resolve chan interface{}, reject chan error) {
+	p := promise.New(func(resolve func(interface{}), reject func(error)) {
 		resp, err := http.Get("http://gobyexample.com")
 		if err != nil {
 			panic(err)
 		}
 		defer resp.Body.Close()
-		if resp.Status == 200 {
-			resolve <- resp.Status
+
+		if resp.StatusCode == 200 {
+			resolve(resp.Status)
 		} else {
-			reject <- errors.New("Errr...")
+			reject(errors.New("ERRR"))
 		}
 	})
 
@@ -36,6 +38,7 @@ func main() {
 
 	p.Wait()
 }
+
 ```
 
 ### Contributors
