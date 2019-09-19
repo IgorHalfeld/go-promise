@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	p := promise.New(func(resolve chan interface{}, reject chan error) {
+	p := promise.New(func(resolve func(interface{}), reject func(error)) {
 		resp, err := http.Get("http://gobyexample.com")
 		if err != nil {
 			panic(err)
@@ -17,9 +17,9 @@ func main() {
 		defer resp.Body.Close()
 
 		if resp.StatusCode == 200 {
-			resolve <- resp.Status
+			resolve(resp.Status)
 		} else {
-			reject <- errors.New("ERRR")
+			reject(errors.New("ERRR"))
 		}
 	})
 
